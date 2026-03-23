@@ -1,0 +1,194 @@
+[
+  {
+    "id": "after-shower",
+    "name": "After Shower",
+    "time": "anytime",
+    "icon": "🚿",
+    "totalMinutes": 7,
+    "steps": [
+      {
+        "name": "Spray",
+        "minutes": 1
+      },
+      {
+        "name": "Shave",
+        "minutes": 1
+      },
+      {
+        "name": "Face toner",
+        "minutes": 1
+      },
+      {
+        "name": "Dry hair",
+        "minutes": 1
+      },
+      {
+        "name": "Eucrisa",
+        "minutes": 1
+      },
+      {
+        "name": "Face cream",
+        "minutes": 1
+      },
+      {
+        "name": "Body lotion",
+        "minutes": 1
+      }
+    ]
+  },
+  {
+    "id": "arrived-home",
+    "name": "Arrived Home Routine",
+    "time": "anytime",
+    "icon": "🏠",
+    "totalMinutes": 54,
+    "steps": [
+      {
+        "name": "Use a Pomodoro timer",
+        "minutes": 25
+      },
+      {
+        "name": "Gather your study materials",
+        "minutes": 10
+      },
+      {
+        "name": "Sanitize watch and phone",
+        "minutes": 1
+      },
+      {
+        "name": "Charge your devices",
+        "minutes": 1
+      },
+      {
+        "name": "Wash the dishes",
+        "minutes": 15
+      },
+      {
+        "name": "Clean mirror and Laundry",
+        "minutes": 1
+      },
+      {
+        "name": "Tidy your desk",
+        "minutes": 1
+      }
+    ]
+  },
+  {
+    "id": "morning-routine",
+    "name": "Fred's Morning Routine",
+    "time": "5:00",
+    "icon": "☀️",
+    "totalMinutes": 17,
+    "steps": [
+      {
+        "name": "Weigh yourself",
+        "minutes": 1
+      },
+      {
+        "name": "Drink water",
+        "minutes": 1
+      },
+      {
+        "name": "Brush your teeth",
+        "minutes": 3
+      },
+      {
+        "name": "Put on contact lens",
+        "minutes": 1
+      },
+      {
+        "name": "Do your skincare",
+        "minutes": 3
+      },
+      {
+        "name": "Make your bed",
+        "minutes": 1
+      },
+      {
+        "name": "Get gym dressed",
+        "minutes": 5
+      },
+      {
+        "name": "Place work shirt, pants, boxer, socks, gloves in gym bag",
+        "minutes": 1
+      },
+      {
+        "name": "Grab AirPods, watch and badge",
+        "minutes": 1
+      }
+    ]
+  },
+  {
+    "id": "settling",
+    "name": "Settling",
+    "time": "anytime",
+    "icon": "💻",
+    "totalMinutes": 16,
+    "steps": [
+      {
+        "name": "Start Pomodoro",
+        "minutes": 1
+      },
+      {
+        "name": "Remarkable",
+        "minutes": 1
+      },
+      {
+        "name": "Charger and 3 cables plugged in",
+        "minutes": 1
+      },
+      {
+        "name": "Laptop stand",
+        "minutes": 1
+      },
+      {
+        "name": "Keyboard",
+        "minutes": 1
+      },
+      {
+        "name": "Mice",
+        "minutes": 1
+      },
+      {
+        "name": "Refresh Secure Key Chrome",
+        "minutes": 1
+      },
+      {
+        "name": "Refresh Jetski",
+        "minutes": 1
+      },
+      {
+        "name": "SSH to cloud top",
+        "minutes": 1
+      },
+      {
+        "name": "Opal and Foqos lock",
+        "minutes": 1
+      },
+      {
+        "name": "Leech block lock corp",
+        "minutes": 1
+      },
+      {
+        "name": "Leech block lock personal",
+        "minutes": 1
+      },
+      {
+        "name": "YouTube lock personal",
+        "minutes": 1
+      },
+      {
+        "name": "Calendar and g/e",
+        "minutes": 1
+      },
+      {
+        "name": "Headphone play music on laptop",
+        "minutes": 1
+      },
+      {
+        "name": "Plan timebox",
+        "minutes": 1
+      }
+    ]
+  }
+]

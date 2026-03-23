@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Routines">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Routines</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #FFD60A;
+    --yellow-dark: #E6C009;
+    --bg: #f5f5f5;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --text-secondary: #888;
+    --border: #eee;
+    --check-done: #2d2d2d;
+    --check-empty: #d0d0d0;
+    --green: #34C759;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
+  }
+
+  /* ===== LIST VIEW ===== */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .list-header {
+    padding: 3rem 1.5rem 1rem;
+  }
+
+  .list-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .list-header p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+  }
+
+  .routine-list {
+    padding: 0 1rem 6rem;
+  }
+
+  .routine-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: transform 0.15s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .routine-card:active { transform: scale(0.98); }
+
+  .routine-icon {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .routine-info { flex: 1; }
+
+  .routine-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .routine-meta {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.15rem;
+  }
+
+  .routine-arrow {
+    color: var(--check-empty);
+    font-size: 1.2rem;
+  }
+
+  /* ===== ROUTINE VIEW ===== */
+  .routine-header {
+    padding: 1rem 1.5rem 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .back-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem 0.5rem 0.5rem 0;
+    line-height: 1;
+  }
+
+  .routine-header-info { flex: 1; }
+
+  .routine-header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .routine-header .meta {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.15rem;
+  }
+
+  .steps-list {
+    padding: 0.5rem 1rem 8rem;
+  }
+
+  .step-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .step-card:active { transform: scale(0.98); }
+
+  .step-card.done {
+    opacity: 0.5;
+  }
+
+  .step-num {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    width: 1.5rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .step-name {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .step-time {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    margin-right: 0.5rem;
+  }
+
+  .step-check {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2.5px solid var(--check-empty);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .step-card.done .step-check {
+    background: var(--check-done);
+    border-color: var(--check-done);
+  }
+
+  .step-check svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .step-card.done .step-check svg { opacity: 1; }
+
+  /* Bottom bar */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem 1.5rem calc(1rem + env(safe-area-inset-bottom));
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .action-btn {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 30px;
+    border: none;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .action-btn:active { transform: scale(0.97); }
+
+  .btn-primary {
+    background: var(--yellow);
+    color: var(--text);
+  }
+
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--text-secondary);
+    flex: 0;
+    padding: 1rem 1.5rem;
+  }
+
+  /* Progress bar */
+  .progress-container {
+    padding: 0 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.35rem;
+  }
+
+  /* Completion screen */
+  .complete-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .complete-emoji {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  .complete-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .complete-sub {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Elapsed timer */
+  .elapsed {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 0.5rem;
+  }
+
+  @keyframes checkPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  .pop { animation: checkPop 0.25s ease; }
+</style>
+</head>
+<body>
+
+<!-- LIST VIEW -->
+<div class="view active" id="listView">
+  <div class="list-header">
+    <h1>Routines</h1>
+    <p>Tap to start</p>
+  </div>
+  <div class="routine-list" id="routineList"></div>
+</div>
+
+<!-- ROUTINE VIEW -->
+<div class="view" id="routineView">
+  <div class="routine-header">
+    <button class="back-btn" id="backBtn">‹</button>
+    <div class="routine-header-info">
+      <h1 id="routineTitle"></h1>
+      <div class="meta" id="routineMeta"></div>
+    </div>
+  </div>
+  <div class="progress-container">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text">
+      <span id="progressCount">0 / 0</span>
+      <span id="elapsedTime"></span>
+    </div>
+  </div>
+  <div class="steps-list" id="stepsList"></div>
+  <div class="bottom-bar" id="bottomBar">
+    <button class="action-btn btn-secondary" id="resetBtn">Reset</button>
+    <button class="action-btn btn-primary" id="undoBtn">▶ Undo</button>
+  </div>
+</div>
+
+<!-- COMPLETE VIEW -->
+<div class="view" id="completeView">
+  <div class="complete-view">
+    <div class="complete-emoji">🎉</div>
+    <div class="complete-title" id="completeTitle">All done!</div>
+    <div class="complete-sub" id="completeSub"></div>
+    <button class="action-btn btn-primary" id="completeBtn" style="width:200px">Done</button>
+  </div>
+</div>
+
+<script>
+let routines = [];
+let current = null; // { routine, checked: Set, startTime }
+
+const listView = document.getElementById('listView');
+const routineView = document.getElementById('routineView');
+const completeView = document.getElementById('completeView');
+const routineList = document.getElementById('routineList');
+const stepsList = document.getElementById('stepsList');
+const routineTitle = document.getElementById('routineTitle');
+const routineMeta = document.getElementById('routineMeta');
+const progressFill = document.getElementById('progressFill');
+const progressCount = document.getElementById('progressCount');
+const elapsedTime = document.getElementById('elapsedTime');
+const backBtn = document.getElementById('backBtn');
+const resetBtn = document.getElementById('resetBtn');
+const undoBtn = document.getElementById('undoBtn');
+const completeBtn = document.getElementById('completeBtn');
+const completeTitle = document.getElementById('completeTitle');
+const completeSub = document.getElementById('completeSub');
+
+function vibrate(ms) {
+  if (navigator.vibrate) navigator.vibrate(ms);
+}
+
+function showView(view) {
+  [listView, routineView, completeView].forEach(v => v.classList.remove('active'));
+  view.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function getState() {
+  return JSON.parse(localStorage.getItem('routinery-state') || '{}');
+}
+
+function saveState() {
+  if (!current) return;
+  const state = getState();
+  state[current.routine.id] = {
+    checked: [...current.checked],
+    startTime: current.startTime
+  };
+  localStorage.setItem('routinery-state', JSON.stringify(state));
+}
+
+function loadState(routineId) {
+  const state = getState();
+  const s = state[routineId];
+  if (!s) return { checked: new Set(), startTime: Date.now() };
+  // Reset if from a different day
+  const saved = new Date(s.startTime).toDateString();
+  if (saved !== new Date().toDateString()) return { checked: new Set(), startTime: Date.now() };
+  return { checked: new Set(s.checked), startTime: s.startTime };
+}
+
+function formatTime(t) {
+  if (t.match(/^\d{1,2}:\d{2}$/)) {
+    const [h, m] = t.split(':').map(Number);
+    const ampm = h >= 12 ? 'pm' : 'am';
+    const h12 = h % 12 || 12;
+    return m ? `${h12}:${String(m).padStart(2,'0')}${ampm}` : `${h12}${ampm}`;
+  }
+  return t;
+}
+
+function renderList() {
+  const state = getState();
+  const today = new Date().toDateString();
+
+  routineList.innerHTML = routines.map(r => {
+    const s = state[r.id];
+    let doneCount = 0;
+    if (s && new Date(s.startTime).toDateString() === today) {
+      doneCount = s.checked.length;
+    }
+    const total = r.steps.length;
+    const allDone = doneCount === total;
+    const statusText = allDone ? '✅ Complete' :
+      doneCount > 0 ? `${doneCount}/${total} done` :
+      `${r.totalMinutes}m`;
+
+    return `<div class="routine-card" data-id="${r.id}">
+      <div class="routine-icon">${r.icon}</div>
+      <div class="routine-info">
+        <div class="routine-name">${r.name}</div>
+        <div class="routine-meta">${formatTime(r.time)} · ${statusText}</div>
+      </div>
+      <div class="routine-arrow">›</div>
+    </div>`;
+  }).join('');
+
+  routineList.querySelectorAll('.routine-card').forEach(card => {
+    card.addEventListener('click', () => openRoutine(card.dataset.id));
+  });
+}
+
+function openRoutine(id) {
+  const routine = routines.find(r => r.id === id);
+  if (!routine) return;
+
+  const state = loadState(id);
+  current = { routine, checked: state.checked, startTime: state.startTime };
+  
+  routineTitle.textContent = routine.name;
+  const timeStr = formatTime(routine.time);
+  routineMeta.textContent = `${timeStr} · ${routine.totalMinutes}m`;
+  
+  renderSteps();
+  showView(routineView);
+  startElapsed();
+}
+
+function renderSteps() {
+  const r = current.routine;
+  const done = current.checked;
+
+  stepsList.innerHTML = r.steps.map((s, i) => {
+    const isDone = done.has(i);
+    return `<div class="step-card ${isDone ? 'done' : ''}" data-idx="${i}">
+      <div class="step-num">${i + 1}</div>
+      <div class="step-name">${s.name}</div>
+      <div class="step-time">${s.minutes}m</div>
+      <div class="step-check">
+        <svg viewBox="0 0 14 14" fill="none">
+          <path d="M2 7.5L5.5 11L12 3" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>`;
+  }).join('');
+
+  stepsList.querySelectorAll('.step-card').forEach(card => {
+    card.addEventListener('click', () => toggleStep(parseInt(card.dataset.idx)));
+  });
+
+  updateProgress();
+}
+
+function toggleStep(idx) {
+  if (current.checked.has(idx)) {
+    current.checked.delete(idx);
+  } else {
+    current.checked.add(idx);
+    vibrate(30);
+    // Pop animation
+    const card = stepsList.querySelector(`[data-idx="${idx}"] .step-check`);
+    if (card) { card.classList.add('pop'); setTimeout(() => card.classList.remove('pop'), 300); }
+  }
+  
+  saveState();
+  renderSteps();
+
+  // Check completion
+  if (current.checked.size === current.routine.steps.length) {
+    setTimeout(() => showComplete(), 400);
+  }
+}
+
+function updateProgress() {
+  const total = current.routine.steps.length;
+  const done = current.checked.size;
+  const pct = total ? (done / total * 100) : 0;
+  progressFill.style.width = pct + '%';
+  progressCount.textContent = `${done} / ${total}`;
+}
+
+let elapsedInterval;
+function startElapsed() {
+  clearInterval(elapsedInterval);
+  const update = () => {
+    if (!current) return;
+    const secs = Math.floor((Date.now() - current.startTime) / 1000);
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    elapsedTime.textContent = `${m}:${String(s).padStart(2, '0')} elapsed`;
+  };
+  update();
+  elapsedInterval = setInterval(update, 1000);
+}
+
+function showComplete() {
+  clearInterval(elapsedInterval);
+  const elapsed = Math.floor((Date.now() - current.startTime) / 1000 / 60);
+  completeTitle.textContent = `${current.routine.name} ✅`;
+  completeSub.textContent = `Completed in ${elapsed} minutes`;
+  vibrate([50, 30, 50]);
+  showView(completeView);
+}
+
+backBtn.addEventListener('click', () => {
+  clearInterval(elapsedInterval);
+  current = null;
+  renderList();
+  showView(listView);
+});
+
+resetBtn.addEventListener('click', () => {
+  if (!current) return;
+  current.checked = new Set();
+  current.startTime = Date.now();
+  saveState();
+  renderSteps();
+  startElapsed();
+});
+
+undoBtn.addEventListener('click', () => {
+  if (!current) return;
+  // Find last checked item and uncheck it
+  const arr = [...current.checked];
+  if (arr.length > 0) {
+    current.checked.delete(arr[arr.length - 1]);
+    saveState();
+    renderSteps();
+  }
+});
+
+completeBtn.addEventListener('click', () => {
+  current = null;
+  renderList();
+  showView(listView);
+});
+
+// Load routines
+fetch('routines.json')
+  .then(r => r.json())
+  .then(data => {
+    routines = data;
+    renderList();
+  })
+  .catch(() => {
+    routineList.innerHTML = '<p style="padding:2rem;color:#888;text-align:center">Could not load routines. Check routines.json</p>';
+  });
+
+// Service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
